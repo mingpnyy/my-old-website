@@ -7,12 +7,11 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .bird-card:hover { transform: translateY(-5px); transition: 0.3s; }
-        .correct { background-color: #10B981 !important; color: white; }
-        .wrong { background-color: #EF4444 !important; color: white; }
+        .correct { background-color: #10B981 !important; color: white !important; border-color: transparent !important; }
+        .wrong { background-color: #EF4444 !important; color: white !important; border-color: transparent !important; }
         .audio-controls { display: flex; gap: 0.5rem; justify-content: center; }
         .control-btn {
             background-color: #10B981;
-            hover: #059669;
             color: white;
             border: none;
             border-radius: 0.5rem;
@@ -24,157 +23,327 @@
             align-items: center;
             gap: 0.25rem;
         }
-        .control-btn:hover {
-            background-color: #059669;
-            transform: scale(1.05);
-        }
-        .control-btn:active {
-            transform: scale(0.95);
-        }
+        .control-btn:hover { background-color: #059669; transform: scale(1.05); }
+        .control-btn:active { transform: scale(0.95); }
     </style>
 </head>
-<body class="bg-stone-50 text-stone-800 font-sans">
+<body class="bg-stone-50 text-stone-800 font-sans min-h-screen flex flex-col">
 
-    <header class="bg-emerald-600 text-white py-10 text-center shadow-lg">
-        <h1 class="text-4xl font-bold">嘰嘰喳喳大作戰</h1>
-        <p class="mt-2 text-emerald-100">都市常見鳥類叫聲學習網</p>
+    <header id="game-header" class="bg-emerald-600 text-white py-6 text-center shadow-lg hidden relative">
+        <button onclick="showScreen('menu-screen')" class="absolute left-4 top-1/2 -translate-y-1/2 bg-emerald-700 hover:bg-emerald-800 text-white px-4 py-2 rounded-lg text-sm transition flex items-center gap-1">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+            返回主選單
+        </button>
+        <h1 class="text-3xl font-bold tracking-wider">嘰嘰喳喳大作戰</h1>
+        <p class="text-sm text-emerald-100 mt-1">都市常見鳥類叫聲學習網</p>
     </header>
 
-    <main class="max-w-6xl mx-auto p-6">
-        <h2 class="text-2xl font-bold mb-6 border-l-4 border-emerald-500 pl-3">鳥類圖鑑</h2>
-        <div id="bird-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+    <div id="menu-screen" class="flex-1 flex flex-col items-center justify-center p-6 bg-gradient-to-b from-emerald-50 to-stone-50">
+        <div class="max-w-md w-full bg-white rounded-3xl shadow-xl p-8 border border-emerald-100 text-center">
+            <div class="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                </svg>
+            </div>
+            
+            <h1 class="text-4xl font-black text-emerald-800 mb-2 tracking-wide">嘰嘰喳喳大作戰</h1>
+            <p class="text-stone-500 mb-8 font-medium">你能光憑聲音就認出都市裡的鳥鄰居嗎？</p>
+            
+            <div class="space-y-4">
+                <button onclick="showScreen('quiz-screen')" class="w-full py-4 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-lg rounded-2xl shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition duration-200 block text-center">
+                    🎯 開始遊戲 (聽力大考驗)
+                </button>
+                <button onclick="showScreen('catalog-screen')" class="w-full py-4 bg-stone-700 hover:bg-stone-800 text-white font-bold text-lg rounded-2xl shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition duration-200 block text-center">
+                    📖 鳥類圖鑑 (知識與題庫)
+                </button>
+            </div>
+            <p class="text-xs text-stone-400 mt-8">環境教育數位教材 v3.0</p>
+        </div>
+    </div>
+
+    <main id="catalog-screen" class="max-w-6xl mx-auto p-6 flex-1 hidden w-full">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 border-l-4 border-emerald-500 pl-3 gap-2">
+            <div>
+                <h2 class="text-2xl font-bold">都市鳥類圖鑑</h2>
+                <p class="text-sm text-stone-500 mt-1">點擊卡片可查看詳細說明與冷知識，點擊下方按鈕可聆聽叫聲。</p>
+            </div>
+        </div>
+        <div id="bird-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-12"></div>
+    </main>
+
+    <main id="quiz-screen" class="max-w-2xl mx-auto p-6 flex-1 hidden w-full justify-center items-center">
+        <section class="bg-white p-8 rounded-2xl shadow-xl w-full border border-stone-100 my-8 relative">
+            <div class="absolute top-4 right-6 bg-emerald-50 text-emerald-700 font-bold px-3 py-1 rounded-full text-xs" id="quiz-progress">
+                第 1 / 5 題
             </div>
 
-        <hr class="my-16 border-stone-300">
-
-        <section id="quiz-section" class="max-w-2xl mx-auto bg-white p-8 rounded-2xl shadow-xl mb-20">
-            <h2 class="text-3xl font-bold text-center mb-8">聽力大考驗</h2>
+            <h2 class="text-3xl font-bold text-center mb-2 text-stone-800">聽力大考驗</h2>
+            <p class="text-center text-sm text-stone-400 mb-8">仔細聆聽鳥叫聲，選出正確的鳥類名稱！</p>
             
             <div class="flex flex-col items-center">
-                <button id="play-quiz-btn" class="bg-emerald-500 hover:bg-emerald-600 text-white w-20 h-20 rounded-full flex items-center justify-center shadow-lg transition mb-8">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
+                <button id="play-quiz-btn" class="bg-emerald-500 hover:bg-emerald-600 text-white w-20 h-20 rounded-full flex items-center justify-center shadow-lg transition mb-6 focus:outline-none">
+                    <div id="quiz-icon-container"></div>
                 </button>
                 
-                <p class="text-stone-500 mb-6 italic">點擊上方按鈕聆聽題目</p>
+                <p id="quiz-status-text" class="text-stone-500 mb-8 italic text-sm">點擊上方按鈕聆聽題目</p>
+                <div id="options-container" class="w-full grid grid-cols-1 gap-3"></div>
 
-                <div id="options-container" class="w-full grid grid-cols-1 gap-3">
-                    </div>
+                <button id="view-detail-btn" class="mt-4 hidden text-emerald-600 hover:text-emerald-700 font-medium text-sm underline transition">
+                    💡 查看這隻鳥的詳細資料
+                </button>
 
-                <button id="next-btn" class="mt-8 hidden bg-stone-800 text-white px-6 py-2 rounded-full hover:bg-stone-700 text-sm">下一題</button>
+                <button id="next-btn" class="mt-8 hidden bg-stone-800 text-white px-8 py-3 rounded-full hover:bg-stone-700 font-medium text-sm shadow transition">下一題</button>
             </div>
         </section>
     </main>
 
+    <div id="result-screen" class="max-w-md mx-auto p-6 flex-1 hidden w-full flex-col justify-center items-center">
+        <div class="bg-white rounded-3xl shadow-xl p-8 border border-stone-100 text-center w-full my-8">
+            <h2 class="text-3xl font-black text-stone-800 mb-6">測試結果分析</h2>
+            
+            <div class="relative w-40 h-40 mx-auto mb-6 flex items-center justify-center bg-emerald-50 rounded-full border-4 border-emerald-500 shadow-inner">
+                <div>
+                    <span id="result-score" class="text-5xl font-black text-emerald-600">0</span>
+                    <span class="text-stone-400 text-xl font-bold"> / 5 題</span>
+                </div>
+            </div>
+
+            <p class="text-stone-400 text-xs uppercase tracking-wider mb-1">獲得專屬稱號</p>
+            <div id="result-badge" class="inline-block bg-emerald-600 text-white font-black text-xl px-6 py-2.5 rounded-2xl shadow-md mb-4 tracking-wide">
+                稱號讀取中
+            </div>
+            
+            <p id="result-desc" class="text-stone-600 text-sm px-4 mb-8 leading-relaxed">評價描述</p>
+            
+            <div class="space-y-3">
+                <button onclick="showScreen('quiz-screen')" class="w-full py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl shadow transition">
+                    🔄 再挑戰一次
+                </button>
+                <button onclick="showScreen('menu-screen')" class="w-full py-3 bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold rounded-xl transition">
+                    🏠 回到主選單
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="info-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl transform transition-all flex flex-col">
+            <div id="modal-quiz-feedback" class="py-2.5 text-center font-bold text-white hidden"></div>
+
+            <div class="relative h-56 bg-stone-100">
+                <img id="modal-img" src="" alt="" class="w-full h-full object-cover">
+                <button onclick="closeModal()" class="absolute top-4 right-4 bg-black/50 hover:bg-black/70 text-white w-8 h-8 rounded-full flex items-center justify-center transition">✕</button>
+            </div>
+            <div class="p-6">
+                <h3 id="modal-name" class="text-2xl font-bold text-stone-800 mb-1">鳥類名稱</h3>
+                <p id="modal-nickname" class="text-emerald-600 font-medium text-sm mb-4">別名/俗稱</p>
+                <hr class="border-stone-100 mb-4">
+                <div class="space-y-4 text-stone-600 text-sm leading-relaxed">
+                    <div>
+                        <span class="font-bold text-stone-800 block mb-0.5">🌟 外觀特徵：</span>
+                        <p id="modal-feature"></p>
+                    </div>
+                    <div>
+                        <span class="font-bold text-stone-800 block mb-0.5">🎵 叫聲特點：</span>
+                        <p id="modal-audio-desc"></p>
+                    </div>
+                    <div>
+                        <span class="font-bold text-stone-800 block mb-0.5">💡 趣味生態：</span>
+                        <p id="modal-funfact" class="bg-emerald-50/50 p-3 rounded-xl border border-emerald-100/50 text-emerald-900"></p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-stone-50 px-6 py-4 flex justify-end">
+                <button onclick="closeModal()" class="bg-stone-800 hover:bg-stone-700 text-white px-5 py-2 rounded-xl text-sm font-medium transition">我知道了 / 繼續</button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // 鳥類資料設定
         const birdData = [
-            { id: '1', name: '黑冠麻鷺', img: 'https://raw.githubusercontent.com/mingpnyy/my-website/main/img/black_crowned.JPG', audio: 'https://raw.githubusercontent.com/mingpnyy/my-website/main/audio/black_crowned.mp3' },
-            { id: '2', name: '喜鵲', img: 'https://raw.githubusercontent.com/mingpnyy/my-website/main/img/magpie.JPG', audio: 'https://raw.githubusercontent.com/mingpnyy/my-website/main/audio/magpie.mp3' },
-            { id: '3', name: '五色鳥', img: 'https://raw.githubusercontent.com/mingpnyy/my-website/main/img/barbet.JPG', audio: 'https://raw.githubusercontent.com/mingpnyy/my-website/main/audio/barbet.mp3' },
-            { id: '4', name: '白頭翁', img: 'https://raw.githubusercontent.com/mingpnyy/my-website/main/img/bulbul.JPG', audio: 'https://raw.githubusercontent.com/mingpnyy/my-website/main/audio/bulbul.mp3' },
-            { id: '5', name: '麻雀', img: 'https://raw.githubusercontent.com/mingpnyy/my-website/main/img/sparrow.JPG', audio: 'https://raw.githubusercontent.com/mingpnyy/my-website/main/audio/sparrow.mp3' },
-            { id: '6', name: '珠頸斑鳩', img: 'https://raw.githubusercontent.com/mingpnyy/my-website/main/img/dove.JPG', audio: 'https://raw.githubusercontent.com/mingpnyy/my-website/main/audio/dove.mp3' },
-            { id: '7', name: '家八哥', img: 'https://raw.githubusercontent.com/mingpnyy/my-website/main/img/myna.JPG', audio: 'https://raw.githubusercontent.com/mingpnyy/my-website/main/audio/myna.mp3' },
+            { id: '1', name: '黑冠麻鷺', nickname: '俗稱：大笨鳥、地雷鳥', feature: '身體呈紅褐色，頭頂有黑色冠羽。在草地上覓食時，遇到人會定格不動，以為別人看不到牠。', audioDesc: '常在繁殖期的深夜或清晨發出低沉、如同敲木魚或牛鳴的「嗚、嗚、嗚」續航聲。', funfact: '因為牠們常在校園或公園草地上發呆、動作極慢，甚至車子來了也不太飛走，所以網路上被愛稱為「大笨鳥」。', img: 'https://raw.githubusercontent.com/mingpnyy/my-website/main/img/black_crowned.JPG', audio: 'https://raw.githubusercontent.com/mingpnyy/my-website/main/audio/black_crowned.mp3' },
+            { id: '2', name: '喜鵲', nickname: '俗稱：客鳥、帶來好運的鳥', feature: '體型較大，羽毛主要為黑色與純白色交織，雙翅在陽光下會閃爍著藍綠色的金屬光澤。', audioDesc: '叫聲是非常響亮、粗獷且連續的「夾、夾、夾、夾」聲，大老遠就能聽到。', funfact: '喜鵲是適應力極強的鴉科鳥類，智商非常高！民間傳統認為聽到喜鵲叫代表有喜事或貴客臨門。', img: 'https://raw.githubusercontent.com/mingpnyy/my-website/main/img/magpie.JPG', audio: 'https://raw.githubusercontent.com/mingpnyy/my-website/main/audio/magpie.mp3' },
+            { id: '3', name: '五色鳥', nickname: '別名：台灣擬啄木、森林中的花和尚', feature: '全身大部分為鮮豔的翠綠色，頭部則有黃、藍、紅、黑等顏色，就像一朵會飛的花。', audioDesc: '叫聲是辨識度極高的「郭、郭、郭、郭」，聲音沉悶而規律，非常像和尚在敲木魚。', funfact: '牠們是台灣特有種！非常擅長用嘴喙在枯樹幹上啄洞築巢，所以才被稱為台灣的擬啄木鳥。', img: 'https://raw.githubusercontent.com/mingpnyy/my-website/main/img/barbet.JPG', audio: 'https://raw.githubusercontent.com/mingpnyy/my-website/main/audio/barbet.mp3' },
+            { id: '4', name: '白頭翁', nickname: '俗稱：白頭鵯、都市三俠之一', feature: '頭頂後半部有一塊非常明顯的白羽毛，像是長了白頭髮的老爺爺，因而得名。', audioDesc: '叫聲清脆嘹亮且富有旋律變化，聽起來很像台語的「巧克力、巧克力」或「朱古力」。', funfact: '白頭翁非常適應人類環境，與麻雀、綠繡眼並稱為台灣的「都市三俠」，隨處可見。', img: 'https://raw.githubusercontent.com/mingpnyy/my-website/main/img/bulbul.JPG', audio: 'https://raw.githubusercontent.com/mingpnyy/my-website/main/audio/bulbul.mp3' },
+            { id: '5', name: '麻雀', nickname: '別名：厝鳥、都市三俠之一', feature: '體型嬌小，身上主要是棕色與黑色的斑駁羽毛，雙頰各有一塊非常明顯的黑色大斑塊。', audioDesc: '平時發出單調、輕快的「啾、啾」聲，成群聚在一起時會顯得相當嘈雜。', funfact: '麻雀是跟人類生活最緊密的鳥類，牠們非常有社交性，喜歡成群結隊在稻田、路邊或騎樓覓食。', img: 'https://raw.githubusercontent.com/mingpnyy/my-website/main/img/sparrow.JPG', audio: 'https://raw.githubusercontent.com/mingpnyy/my-website/main/audio/sparrow.mp3' },
+            { id: '6', name: '珠頸斑鳩', nickname: '俗稱：斑鳩、脖子戴珍珠項鍊的鳥', feature: '身體呈粉褐色，最經典的特徵是脖子後面有一條黑底、佈滿白色斑點的「珍珠項鍊」羽毛。', audioDesc: '叫聲非常溫柔低沉，節奏固定為三音節的「咕、咕咕一一」、「咕、咕咕一一」。', funfact: '常被誤認為是鴿子。牠們築巢技術常被網友吐槽「極度隨便」，常常只在冷氣外機或陽台放兩根樹枝就開始生蛋。', img: 'https://raw.githubusercontent.com/mingpnyy/my-website/main/img/dove.JPG', audio: 'https://raw.githubusercontent.com/mingpnyy/my-website/main/audio/dove.mp3' },
+            { id: '7', name: '家八哥', nickname: '別名：外來種八哥、黃腳八哥', feature: '全身大致為黑褐色，眼睛周圍、嘴喙以及腳全部都是鮮豔的黃色，翅膀兩側有白斑。', audioDesc: '叫聲極度多變、嘈雜且粗厲，擅長模仿其他鳥類甚至是環境音，常發出「啊、啊、嘰呀」的怪聲。', funfact: '屬於外來種，目前在台灣都會區強勢擴散。因為牠們極度聰明、什麼都吃，常搶走本土台灣八哥的生存空間。', img: 'https://raw.githubusercontent.com/mingpnyy/my-website/main/img/myna.JPG', audio: 'https://raw.githubusercontent.com/mingpnyy/my-website/main/audio/myna.mp3' },
         ];
 
         const birdGrid = document.getElementById('bird-grid');
         const playQuizBtn = document.getElementById('play-quiz-btn');
+        const quizIconContainer = document.getElementById('quiz-icon-container');
+        const quizStatusText = document.getElementById('quiz-status-text');
         const optionsContainer = document.getElementById('options-container');
         const nextBtn = document.getElementById('next-btn');
+        const viewDetailBtn = document.getElementById('view-detail-btn');
 
         let currentQuizBird = null;
         let quizAudio = new Audio();
-        let birdAudios = {}; // 存儲每個鳥類的音頻對象
-        let isAudioPlaying = false; // 追蹤音頻播放狀態
+        let birdAudios = {}; 
+        let isAudioPlaying = false; 
+        let currentCatalogAudio = null; 
 
-        // 1. 初始化圖鑑
+        // 遊戲狀態變數
+        let quizRound = 0;   // 目前第幾題
+        let score = 0;       // 答對題數
+        const totalQuestions = 5; // 總題數固定為 5
+
+        const playIconHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
+        const pauseIconHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
+
+        // ==========================================
+        // 場景切換功能
+        // ==========================================
+        function showScreen(screenId) {
+            quizAudio.pause();
+            stopCurrentCatalogAudio();
+            updateQuizIcon(false);
+
+            document.getElementById('menu-screen').style.display = 'none';
+            document.getElementById('catalog-screen').classList.add('hidden');
+            document.getElementById('quiz-screen').classList.add('hidden');
+            document.getElementById('result-screen').classList.add('hidden');
+            document.getElementById('game-header').classList.add('hidden');
+
+            if (screenId === 'menu-screen') {
+                document.getElementById('menu-screen').style.display = 'flex';
+            } else {
+                document.getElementById('game-header').classList.remove('hidden');
+                document.getElementById(screenId).classList.remove('hidden');
+                if (screenId === 'quiz-screen') {
+                    resetGame(); // 初始化一局新遊戲
+                }
+            }
+        }
+
+        // ==========================================
+        // 彈出視窗控制 (Modal)
+        // ==========================================
+        function openModal(bird, isQuizMode = false, isCorrect = false) {
+            document.getElementById('modal-img').src = bird.img;
+            document.getElementById('modal-img').alt = bird.name;
+            document.getElementById('modal-name').innerText = bird.name;
+            document.getElementById('modal-nickname').innerText = bird.nickname;
+            document.getElementById('modal-feature').innerText = bird.feature;
+            document.getElementById('modal-audio-desc').innerText = bird.audioDesc;
+            document.getElementById('modal-funfact').innerText = bird.funfact;
+            
+            const feedbackBar = document.getElementById('modal-quiz-feedback');
+            if (isQuizMode) {
+                feedbackBar.classList.remove('hidden');
+                if (isCorrect) {
+                    feedbackBar.className = "py-2.5 text-center font-bold text-white bg-emerald-500 text-sm tracking-wide shadow-inner";
+                    feedbackBar.innerText = "🎉 恭喜你！答對了！";
+                } else {
+                    feedbackBar.className = "py-2.5 text-center font-bold text-white bg-red-500 text-sm tracking-wide shadow-inner";
+                    feedbackBar.innerText = `❌ 答錯囉！標準答案是【${bird.name}】`;
+                }
+            } else {
+                feedbackBar.classList.add('hidden');
+            }
+
+            document.getElementById('info-modal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('info-modal').classList.add('hidden');
+        }
+
+        // ==========================================
+        // 初始化圖鑑渲染
+        // ==========================================
         birdData.forEach(bird => {
-            // 創建音頻對象
             const audio = new Audio(bird.audio);
             birdAudios[bird.id] = audio;
 
             const card = document.createElement('div');
-            card.className = 'bird-card bg-white rounded-xl overflow-hidden shadow-md cursor-pointer border-2 border-transparent hover:border-emerald-400';
+            card.className = 'bird-card bg-white rounded-xl overflow-hidden shadow-md border-2 border-transparent hover:border-emerald-400 flex flex-col justify-between cursor-pointer';
+            card.onclick = () => openModal(bird, false);
+            
             card.innerHTML = `
-                <img src="${bird.img}" alt="${bird.name}" class="w-full h-48 object-cover">
-                <div class="p-4 text-center font-bold text-lg">${bird.name}</div>
-                <div class="audio-controls pb-4">
+                <div>
+                    <img src="${bird.img}" alt="${bird.name}" class="w-full h-48 object-cover">
+                    <div class="p-4 text-center font-bold text-lg text-stone-800">${bird.name}</div>
+                </div>
+                <div class="audio-controls pb-4 px-2">
                     <button class="control-btn play-btn" data-bird-id="${bird.id}" title="播放">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M8 5v14l11-7z"/>
-                        </svg>
-                        播放
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>播放
                     </button>
                     <button class="control-btn pause-btn" data-bird-id="${bird.id}" title="暫停">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>
-                        </svg>
-                        暫停
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24"><path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/></svg>暫停
                     </button>
                     <button class="control-btn replay-btn" data-bird-id="${bird.id}" title="重播">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/>
-                        </svg>
-                        重播
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></svg>重播
                     </button>
                 </div>
             `;
             birdGrid.appendChild(card);
         });
 
-        // 2. 添加音頻控制事件監聽
+        function stopCurrentCatalogAudio() {
+            if (currentCatalogAudio) currentCatalogAudio.pause();
+        }
+
+        // 圖鑑音訊按鈕事件攔截
         document.querySelectorAll('.play-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const birdId = btn.dataset.birdId;
-                birdAudios[birdId].play();
+                e.stopPropagation(); stopCurrentCatalogAudio(); quizAudio.pause(); updateQuizIcon(false);
+                currentCatalogAudio = birdAudios[btn.dataset.birdId]; currentCatalogAudio.play();
             });
         });
-
         document.querySelectorAll('.pause-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const birdId = btn.dataset.birdId;
-                birdAudios[birdId].pause();
-            });
+            btn.addEventListener('click', (e) => { e.stopPropagation(); birdAudios[btn.dataset.birdId].pause(); });
         });
-
         document.querySelectorAll('.replay-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const birdId = btn.dataset.birdId;
-                const audio = birdAudios[birdId];
-                audio.currentTime = 0;
-                audio.play();
+                e.stopPropagation(); stopCurrentCatalogAudio(); quizAudio.pause(); updateQuizIcon(false);
+                currentCatalogAudio = birdAudios[btn.dataset.birdId]; currentCatalogAudio.currentTime = 0; currentCatalogAudio.play();
             });
         });
 
-        // 3. 測驗功能邏輯             
-        function startQuiz() {
-            nextBtn.classList.add('hidden');
-            optionsContainer.innerHTML = '';
-            isAudioPlaying = false;
+        // ==========================================
+        // 測驗核心與回合邏輯
+        // ==========================================
+        function resetGame() {
+            quizRound = 0;
+            score = 0;
+            nextAndNextRound();
+        }
+
+        function nextAndNextRound() {
+            quizRound++;
+            if (quizRound > totalQuestions) {
+                endGameAndShowResult();
+                return;
+            }
             
-            // 隨機選一個正確答案
+            // 更新畫面上第幾題的文字
+            document.getElementById('quiz-progress').innerText = `第 ${quizRound} / ${totalQuestions} 題`;
+
+            quizAudio.pause();
+            stopCurrentCatalogAudio();
+            isAudioPlaying = false;
+            updateQuizIcon(false);
+
+            nextBtn.classList.add('hidden');
+            viewDetailBtn.classList.add('hidden');
+            optionsContainer.innerHTML = '';
+            quizStatusText.innerText = "點擊上方按鈕聆聽題目";
+            
+            // 隨機選題目
             currentQuizBird = birdData[Math.floor(Math.random() * birdData.length)];
             quizAudio.src = currentQuizBird.audio;
 
-            // 產生選項 (正確 + 隨機挑兩個錯誤的)
             let options = [currentQuizBird.name];
             let otherBirds = birdData.filter(b => b.name !== currentQuizBird.name);
             otherBirds.sort(() => 0.5 - Math.random());
             options.push(otherBirds[0].name, otherBirds[1].name);
-            
-            // 洗牌選項順序
             options.sort(() => 0.5 - Math.random());
 
-            // 渲染按鈕
             options.forEach(optName => {
                 const btn = document.createElement('button');
-                btn.className = 'w-full py-2 px-4 text-base border-2 border-stone-200 rounded-lg hover:bg-stone-100 transition duration-200';
+                btn.className = 'w-full py-3 px-4 text-base font-semibold border-2 border-stone-200 text-stone-700 rounded-xl hover:bg-stone-100 transition duration-200 focus:outline-none';
                 btn.innerText = optName;
                 btn.onclick = () => checkAnswer(btn, optName);
                 optionsContainer.appendChild(btn);
@@ -183,42 +352,102 @@
 
         function checkAnswer(selectedBtn, chosenName) {
             const allButtons = optionsContainer.querySelectorAll('button');
-            allButtons.forEach(btn => btn.disabled = true); // 禁止重複點擊
+            allButtons.forEach(btn => btn.disabled = true);
+            quizAudio.pause();
+            updateQuizIcon(false);
 
-            if (chosenName === currentQuizBird.name) {
+            let isCorrect = (chosenName === currentQuizBird.name);
+
+            if (isCorrect) {
                 selectedBtn.classList.add('correct');
-                nextBtn.classList.remove('hidden');
+                quizStatusText.innerText = "太棒了！答對囉！🎉";
+                score++;
             } else {
                 selectedBtn.classList.add('wrong');
-                // 顯示正確答案
+                quizStatusText.innerText = `可惜！這是 【${currentQuizBird.name}】 的叫聲喔！`;
                 allButtons.forEach(btn => {
                     if (btn.innerText === currentQuizBird.name) btn.classList.add('correct');
                 });
-                nextBtn.classList.remove('hidden');
+            }
+
+            // 觸發幫忙點：自動跳出該鳥類的學習視窗，並附帶答題回饋
+            setTimeout(() => {
+                openModal(currentQuizBird, true, isCorrect);
+            }, 300);
+
+            // 允許玩家再次手動點開看
+            viewDetailBtn.onclick = () => openModal(currentQuizBird, true, isCorrect);
+            viewDetailBtn.classList.remove('hidden');
+
+            // 改變按鈕文字，最後一題時按鈕變成「看結果」
+            if (quizRound === totalQuestions) {
+                nextBtn.innerText = "查看結算結果";
+            } else {
+                nextBtn.innerText = "下一題";
+            }
+            nextBtn.classList.remove('hidden');
+        }
+
+        // ==========================================
+        // 結算與分析圖處理
+        // ==========================================
+        function endGameAndShowResult() {
+            document.getElementById('quiz-screen').classList.add('hidden');
+            document.getElementById('result-screen').classList.remove('hidden');
+            
+            // 填入答對題數
+            document.getElementById('result-score').innerText = score;
+
+            // 根據得分給予封號與介紹文字
+            const badgeEl = document.getElementById('result-badge');
+            const descEl = document.getElementById('result-desc');
+
+            if (score === 5) {
+                badgeEl.innerText = "👑 都市鳥類大師";
+                badgeEl.className = "inline-block bg-amber-500 text-white font-black text-xl px-6 py-2.5 rounded-2xl shadow-md mb-4 tracking-wide animate-bounce";
+                descEl.innerText = "太不可思議了！你竟然達成了完美通關！都市叢林裡的大小鳥鳴完全逃不過你的耳朵，你簡直就是鳥兒在人間的代言人！";
+            } else if (score >= 3) {
+                badgeEl.innerText = " Owls 🦉 賞鳥資深專家";
+                badgeEl.className = "inline-block bg-emerald-600 text-white font-black text-xl px-6 py-2.5 rounded-2xl shadow-md mb-4 tracking-wide";
+                descEl.innerText = "非常厲害！你已經能精準分辨大部分都會鳥類的聲音。下次在公園散步時，不妨抬頭找找看，你一定能一秒認出牠們！";
+            } else if (score >= 1) {
+                badgeEl.innerText = "🐣 賞鳥實習生";
+                badgeEl.className = "inline-block bg-stone-600 text-white font-black text-xl px-6 py-2.5 rounded-2xl shadow-md mb-4 tracking-wide";
+                descEl.innerText = "有進步的空間喔！雖然聽出了一些端倪，但有些鳥類的神秘叫聲還是讓你困惑了。點進圖鑑多聽幾次，你一定能突飛猛進！";
+            } else {
+                badgeEl.innerText = "🥚 迷路的小鳥";
+                badgeEl.className = "inline-block bg-red-400 text-white font-black text-xl px-6 py-2.5 rounded-2xl shadow-md mb-4 tracking-wide";
+                descEl.innerText = "哎呀，全部都被鳥兒們忽悠過去了！別灰心，這代表你有無限的成長潛力。先去「鳥類圖鑑」好好的特訓一下，再回來復仇吧！";
             }
         }
 
-        // 事件監聽 - 播放/停止切換
-        playQuizBtn.onclick = () => {
-            if (isAudioPlaying) {
-                quizAudio.pause();
-                isAudioPlaying = false;
+        function updateQuizIcon(playing) {
+            isAudioPlaying = playing;
+            if (playing) {
+                quizIconContainer.innerHTML = pauseIconHTML;
+                quizStatusText.innerText = "播放中...";
             } else {
-                quizAudio.play();
-                isAudioPlaying = true;
+                quizIconContainer.innerHTML = playIconHTML;
+                if (!nextBtn.classList.contains('hidden')) return;
+                quizStatusText.innerText = "點擊上方按鈕聆聽題目";
+            }
+        }
+
+        playQuizBtn.onclick = () => {
+            stopCurrentCatalogAudio();
+            if (isAudioPlaying) {
+                quizAudio.pause(); updateQuizIcon(false);
+            } else {
+                quizAudio.play(); updateQuizIcon(true);
             }
         };
 
-        // 監聽音頻結束事件
-        quizAudio.addEventListener('ended', () => {
-            isAudioPlaying = false;
-        });
+        quizAudio.addEventListener('ended', () => updateQuizIcon(false));
+        nextBtn.onclick = nextAndNextRound;
 
-        nextBtn.onclick = startQuiz;
-
-        // 頁面加載後初始化測驗
-        window.onload = startQuiz;
-
+        document.getElementById('info-modal').onclick = function(e) {
+            if (e.target === this) closeModal();
+        };
     </script>
 </body>
 </html>
